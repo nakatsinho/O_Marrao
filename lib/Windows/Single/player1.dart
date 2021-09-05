@@ -1,0 +1,769 @@
+import 'package:flutter/material.dart';
+import 'package:fluttery_audio/fluttery_audio.dart';
+
+import 'package:o_marrao/Controllers/overlayController.dart';
+
+//import 'package:o_marrao/Controllers/overlayController.dart';
+import 'dart:async';
+import 'package:o_marrao/Controllers/questionaryController.dart';
+import 'package:o_marrao/Models/questionary.dart';
+import 'package:o_marrao/Models/repository.dart';
+import 'package:o_marrao/Models/tone.dart';
+import 'package:o_marrao/Windows/Single/NiveisPointsPages/nivel1.dart';
+import 'package:o_marrao/Windows/Single/points.dart';
+import 'package:flutter/foundation.dart';
+import 'package:o_marrao/Windows/settings.dart';
+import 'package:o_marrao/login.dart';
+
+class SingleHome extends StatefulWidget {
+  SingleHome({this.username, this.emailv, this.num});
+
+  final String username, emailv, num;
+
+  @override
+  State createState() => new _SingleHomeState();
+}
+
+class _SingleHomeState extends State<SingleHome> {
+  _SingleHomeState() {
+    init();
+  }
+
+  Question _currentQuestion;
+  QuestionList _quizQuestions = new QuestionList([
+    new Question(
+        "Qual é a maior unidade sanitária de Moçambique?",
+        "Hospital Central da Beira",
+        "Hospital Geral José Macamo",
+        "Hospital Central de Maputo",
+        "Clínica Privada de Maputo",
+        "C"),
+    new Question(
+        "Qual é o nome dado ao médico especialista em doenças de pele?",
+        "Dermatologista",
+        "Dermatólo",
+        "Farmacêutico",
+        "Cirurgião Plástico",
+        "A"),
+    new Question("Das doenças que se seguem, qual delas é hereditária? ",
+        "Malária", "Cólera", "Gengivite", "Diabetes", "D"),
+    new Question("Uma pessoa com incapacidade de distinguir cores é: ", "Cega",
+        "Daltónica", "Daltonismo", "Vidente", "B"),
+    new Question("Uma pessoa que tem carência de sangue no organismo é: ",
+        "Altruísta", "Altista", "Nutricionista", "Anémica", "D"),
+    new Question("Qual destes já foi ministro da saúde? ", "Ivo Garrido",
+        "Filipe Jacinto", "Herminio Chissano", "Jorge Matável", "A"),
+    new Question("Que nome se dá a um indivíduo excessivamente gordo? ",
+        "Obeso", "Obsessão", "Gorducho", "Fofo", "A"),
+    new Question("Como se chama a pessoa que assiste aos partos?",
+        "Parturientes", "Patrizes", "Parteira", "Assistente de cama", "C"),
+    new Question(
+        "Como se denomina a medida de peso equivalente a 15 quilogramas?",
+        "Quinzena",
+        "Alfarroba",
+        "Arroba",
+        "Quinzada",
+        "C"),
+    new Question("A obra ″O País de Mim″ é da autoria de:", "Eduardo White",
+        "Lília Momplé", "Nelson Saúte", "Luís Carlos Patraquim", "A"),
+    new Question(
+        "Todas as palavras fazem parte do mesmo campo semântico, excepto:",
+        "Peixe",
+        "Anzol",
+        "Antena",
+        "Carapau",
+        "C"),
+    new Question("Como se chama o gás que provoca lágrimas", "Lacrimogénio",
+        "Lagrimoso", "Lagrimogenio", "Lacrimso", "A"),
+    new Question("Um terreno que tem muita areia denomina-se:", "Areioso",
+        "Arenoso", "Arinoso", "Areiado", "B"),
+    new Question("Aquele que fabrica louça de barro é:", "Moleiro", "Oleiro",
+        "Armando", "Barreiro", "B"),
+    new Question(
+        "Todas as obras pertencem a Mia Couto, excepto: ",
+        "Ualalapi",
+        "O Bebedor de horizontes ",
+        "Mulheres de Cinza",
+        "Raiz de orvalho",
+        "A"),
+    new Question("Dá-se o nome de bando a um conjunto de:", "Jovens", "Cavalos",
+        "Peixes", "Aves ", "D"),
+    new Question("Como se chama o macho da cabra?", "Cabrito", "Bode", "Touro",
+        "Carneiro", "B"),
+    new Question(
+        "A quem pertence o pseudónimo Ungulane Baka Khossa?",
+        "António Emílio Leite",
+        "Lucílio Manjate",
+        "Marcelo Rebelo ",
+        "Francisco Esaú Cossa",
+        "D"),
+    new Question("A palavra zum-zum, é: ", "Sigla", "Onomatopeia",
+        "Composta por aglutinação ", "Composta por justaposição ", "B"),
+    new Question(
+        "As palavras que indicam a reprodução de sons ou ruídos naturais chamam-se? ",
+        "Sigla",
+        "Onomatopeias",
+        "Sinónimos",
+        "Acrónimos",
+        "B"),
+  ]);
+
+  int _questionNumber = 0;
+  int _score = 0;
+  int _life = 3;
+  String _level = "";
+  int _pontos = 0;
+  bool _isCorrect;
+  bool _overlayVisible;
+  Color _btnColor;
+  Color _btnColor1;
+  Color _btnColor2;
+  Color _btnColor3;
+  MaterialButton o;
+  String _nivel = "Bebé";
+  Icon _icon = Icon(Icons.star_border);
+
+  double _value = 0.0;
+
+  void init() {
+    _btnColor = Colors.white;
+    _btnColor1 = Colors.white;
+    _btnColor2 = Colors.white;
+    _btnColor3 = Colors.white;
+    _overlayVisible = false;
+    _currentQuestion = _quizQuestions.nextQuestion;
+    _questionNumber = _quizQuestions.questionNumber;
+  }
+
+  void _onChange(double value) {
+    setState(() {
+      _value = value;
+    });
+  }
+
+  void choiceHandler(String opt) {
+    //BLOCO RESPONSAVEL POR FAZER O PUSH DE JANELAS DE NIVEIS
+//    if (_questionNumber == _quizQuestions.length) {
+//      Timer(
+//          Duration(seconds: 2),
+//          () => this.setState(() {
+//                Navigator.of(context).push(new MaterialPageRoute(
+//                    builder: (BuildContext context) =>
+//                        new PointsPage(_score, _quizQuestions.length)));
+//              }));
+//    }
+    this.setState(() {
+      _overlayVisible = true;
+    });
+
+    _isCorrect = (opt == _currentQuestion.correctAnswer);
+    _score = (_isCorrect) ? _score + 1 : _score;
+    _life = (_isCorrect) ? _life : _life - 1;
+
+
+    _value = (_isCorrect) ? _value + 5 : _value;
+
+    //BLOCO RESPONSAVEL POR EMITIR INFO DAS ESTRELAS & ZERAR SPLASH DE NIVEIS
+
+    if (_score == 0) {
+      _level = "Mau";
+    }
+    if (_score >= 1 && _score <=3) {
+      _level = "Muito Mau";
+    }
+    if (_score >= 4 && _score <=9) {
+      _level = "Insuficiente";
+    }
+    if (_score >= 10 && _score <=15) {
+      _level = "Suficiente";
+    }
+    if (_score >= 16 && _score <=18) {
+      _level = "Bom";
+    }
+    if (_score >= 19 && _score <=20) {
+      _level = "Muito Bom";
+    }
+
+    //POPUPS & SPLASH DE NIVEIS CLOSE
+
+
+    if (_questionNumber == _quizQuestions.length) {
+      Timer(
+          Duration(seconds: 1),
+          () => this.setState(() {
+                Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        new NivelP1(_score, _quizQuestions.length, _level)));
+              }));
+
+      _value = 0.0;
+    }
+
+    //BLOCO RESPONSAVEL POR VISUALIZAR OS NIVEIS
+
+//    if (_score == 10 && _score < 20) {
+//      _nivel = "Matreco";
+//    } else if (_score >= 20 && _score < 30) {
+//      _nivel = "Aspirante";
+//    } else if (_score >= 30 && _score < 40) {
+//      _nivel = "Atento";
+//    } else if (_score >= 40 && _score < 50) {
+//      _nivel = "Esperto";
+//    } else if (_score >= 50 && _score < 60) {
+//      _nivel = "Nerd";
+//    }
+
+    //NIVEIS CLOSE
+
+    //BLOCO SOMADOR DE PONTOS
+    if (_score >= 5) {
+      _pontos = _pontos + 5;
+    }
+    //SOMADOR DE PONTOS CLOSE
+
+    if (_isCorrect = (opt == _currentQuestion.correctAnswer)) {
+      if (opt == "A") {
+        _btnColor = Colors.green;
+        _btnColor1 = Colors.white70;
+        _btnColor2 = Colors.white70;
+        _btnColor3 = Colors.white70;
+      } else if (opt == "B") {
+        _btnColor = Colors.white70;
+        _btnColor1 = Colors.green;
+        _btnColor2 = Colors.white70;
+        _btnColor3 = Colors.white70;
+      } else if (opt == "C") {
+        _btnColor = Colors.white70;
+        _btnColor1 = Colors.white70;
+        _btnColor2 = Colors.green;
+        _btnColor3 = Colors.white70;
+      } else if (opt == "D") {
+        _btnColor = Colors.white70;
+        _btnColor1 = Colors.white70;
+        _btnColor2 = Colors.white70;
+        _btnColor3 = Colors.green;
+      }
+    } else if (_isCorrect = (opt != _currentQuestion.correctAnswer)) {
+      if (opt == "A") {
+        _btnColor = Colors.red;
+        _btnColor1 = Colors.white70;
+        _btnColor2 = Colors.white70;
+        _btnColor3 = Colors.white70;
+      }
+      if (opt == "B") {
+        _btnColor = Colors.white70;
+        _btnColor1 = Colors.red;
+        _btnColor2 = Colors.white70;
+        _btnColor3 = Colors.white70;
+      }
+      if (opt == "C") {
+        _btnColor = Colors.white70;
+        _btnColor1 = Colors.white70;
+        _btnColor2 = Colors.red;
+        _btnColor3 = Colors.white70;
+      }
+      if (opt == "D") {
+        _btnColor = Colors.white70;
+        _btnColor1 = Colors.white70;
+        _btnColor2 = Colors.white70;
+        _btnColor3 = Colors.red;
+      }
+    }
+
+    if (_life == 0) {
+
+        Timer(
+            Duration(seconds: 3),
+                () => this.setState(() {
+              Navigator.of(context).push(new MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                  new PointsPage(_score, _quizQuestions.length, _level)));
+            }));
+
+    }
+
+    //
+
+    Timer(
+        Duration(seconds: 1),
+        () => this.setState(() {
+              init();
+            }));
+  }
+
+  Column createTableAnswer(Question obj) {
+    return Column(
+      children: <Widget>[
+        Row(
+          children: <Widget>[
+            new Repository(
+              _btnColor,
+              "A",
+              obj.option1,
+              () {
+                choiceHandler("A");
+              },
+            ),
+          ],
+        ),
+        Row(
+          children: <Widget>[
+            new Repository(
+              _btnColor1,
+              "B",
+              obj.option2,
+              () {
+                choiceHandler("B");
+              },
+            ),
+          ],
+        ),
+        Row(
+          children: <Widget>[
+            new Repository(
+              _btnColor2,
+              "C",
+              obj.option3,
+              () {
+                choiceHandler("C");
+              },
+            ),
+          ],
+        ),
+        Row(
+          children: <Widget>[
+            new Repository(
+              _btnColor3,
+              "D",
+              obj.option4,
+              () {
+                choiceHandler("D");
+              },
+            ),
+          ],
+        )
+      ],
+    );
+  }
+
+  String img1 =
+      "https://i.amz.mshcdn.com/h9L3aQ3E8Yf6aeoVdTySccCQmmc=/fit-in/1200x9600/https%3A%2F%2Fblueprint-api-production.s3.amazonaws.com%2Fuploads%2Fcard%2Fimage%2F339018%2Fcf616a1b-9ff6-4444-a449-5f9e3ad327fa.jpg";
+  String nome1 = "$username";
+  String emai = "$emailv";
+  String numer = "$num";
+  String backup, backup2, backup3;
+
+  void userProfile() {
+    this.setState(() {
+      backup = nome1;
+      nome1 = backup;
+
+      backup2 = img1;
+      img1 = backup2;
+
+      backup3 = emai;
+      emai = backup3;
+    });
+  }
+
+  void _alertNivel0() {
+    AlertDialog alertsnivel0 = new AlertDialog(
+      title: new Text(
+        "Wow... Subiu de nivel " + _nivel + "!",
+        style: TextStyle(color: Colors.red),
+        textAlign: TextAlign.center,
+      ),
+      content: new Text(
+        "Vamos a isso " + _nivel + " voce consegue!",
+        style: TextStyle(color: Colors.orange),
+        textAlign: TextAlign.center,
+      ),
+      actions: <Widget>[
+        new RaisedButton(
+            color: Colors.orange,
+            child: new Text("OK",
+                overflow: TextOverflow.fade,
+                style: TextStyle(color: Colors.white)),
+            onPressed: () {
+              Navigator.pop(context);
+            })
+      ],
+    );
+
+    showDialog(
+      context: context,
+      child: Row(
+        children: <Widget>[
+          alertsnivel0,
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    
+    return Audio(
+      audioUrl: demoPlayList.songs[0].audioUrl,
+      playbackState: PlaybackState.paused,
+      child: Scaffold(
+        resizeToAvoidBottomPadding: false,
+        appBar: new AppBar(
+          iconTheme: IconThemeData(color: Colors.black),
+          centerTitle: true,
+          backgroundColor: Color.fromRGBO(178, 26, 4, -0.1),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  new Text(
+                    "Stage: " +
+                        _questionNumber.toString() +
+                        "/" +
+                        _quizQuestions.length.toString(),
+                    style: TextStyle(
+                        fontSize: 20.0,
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w300,
+                        fontFamily: 'Mono Social Icons',
+                        color: Colors.black),
+                  ),
+                ],
+              ),
+              new CircleAvatar(
+                radius: 70.0,
+                backgroundColor: Colors.transparent,
+                child: Image.asset(
+                  "assets/marrao/logo2.png",
+                ),
+              ),
+            ],
+          ),
+          elevation:
+              defaultTargetPlatform == TargetPlatform.android ? 5.0 : 0.0,
+          bottom: PreferredSize(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  new Slider(
+                      activeColor: Colors.orange,
+                      min: 0.0,
+                      max: 100.0,
+                      value: _value,
+                      onChanged: (double value) {
+                        _onChange(value);
+                      }),
+                  new Text(
+                    "Nível: " + _nivel.toString(),
+                    style: TextStyle(
+                        fontSize: 20.0,
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w300,
+                        fontFamily: 'Mono Social Icons',
+                        color: Colors.black),
+                  ),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Text(
+                          "" + _life.toString(),
+                          style: TextStyle(
+                              fontSize: 20.0,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w300,
+                              fontFamily: 'Mono Social Icons',
+                              color: Colors.orange),
+                        ),
+                        new Icon(
+                          Icons.favorite_border,
+                          color: Colors.orange,
+                        )
+                      ]),
+                ],
+              ),
+              preferredSize: Size(1.0, 22.0)),
+          actions: <Widget>[
+            //new Icon(Icons.more_vert),
+            new Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            )
+          ],
+        ),
+        drawer: new Drawer(
+          child: new ListView(
+            children: <Widget>[
+              new UserAccountsDrawerHeader(
+                currentAccountPicture: new GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).push(new MaterialPageRoute(
+                        builder: (BuildContext context) => new Profile(
+                            //img: img1,
+                            //nome: nome1,
+                            )));
+                  },
+                  child: new CircleAvatar(
+                    radius: 28.0,
+                    backgroundColor: Colors.red,
+                    child: Image.asset("assets/marrao/logo.png"),
+                    //backgroundImage: AssetImage(),
+                  ),
+                ),
+                accountName: new Text(
+                  nome1+" - Jogador",
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      fontStyle: FontStyle.normal,
+                      fontWeight: FontWeight.w300,
+                      fontFamily: 'Mono Social Icons',
+                      color: Colors.white),
+                ),
+                accountEmail: new Text(
+                  emai,
+                  style: TextStyle(
+                      fontSize: 13.0,
+                      fontStyle: FontStyle.normal,
+                      fontWeight: FontWeight.w400,
+                      fontFamily: 'Mono Social Icons',
+                      color: Colors.black),
+                ),
+              ),
+              new ListTile(
+                title: new Text(
+                  "Contacto: +258 "+numer,
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.w300,
+                    fontFamily: 'Mono Social Icons',
+                  ),
+                ),
+              ),
+              new Divider(),
+              new ListTile(
+                title: new Text(
+                  "Recordes",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.w300,
+                    fontFamily: 'Mono Social Icons',
+                  ),
+                ),
+                trailing: new Icon(Icons.score),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushNamed("/Position");
+                },
+              ),
+              new ListTile(
+                title: new Text(
+                  "Definições",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.w300,
+                    fontFamily: 'Mono Social Icons',
+                  ),
+                ),
+                trailing: new Icon(Icons.settings),
+              ),
+              new Divider(),
+              new ListTile(
+                  title: new Text(
+                    "Reiniciar Jogo",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontStyle: FontStyle.normal,
+                      fontWeight: FontWeight.w300,
+                      fontFamily: 'Mono Social Icons',
+                    ),
+                  ),
+                  trailing: new Icon(Icons.refresh),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushNamed("/SingleHome");
+                  }),
+              new Divider(),
+              new ListTile(
+                title: new Text(
+                  "Fechar",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'Mono Social Icons',
+                  ),
+                ),
+                trailing: new Icon(Icons.close),
+                onTap: () => Navigator.of(context).pop(),
+              ),
+              new ListTile(
+                  //Waiting of any ideia of me
+                  ),
+              new Divider(),
+              new Card(
+                color: Colors.red,
+                child: new ListTile(
+                  title: new Text(
+                    "Sair do Jogo",
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      fontStyle: FontStyle.normal,
+                      fontWeight: FontWeight.w300,
+                      fontFamily: 'Mono Social Icons',
+                    ),
+                  ),
+                  trailing: new Icon(
+                    Icons.keyboard_backspace,
+                    color: Colors.black,
+                    size: 24.0,
+                  ),
+                  onTap: () => Navigator.of(context).pushNamed("/Login"),
+                ),
+              ),
+              new Divider(
+                height: 20.0,
+              ),
+            ],
+          ),
+        ),
+        body: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            new Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/marrao/red.png'),
+                    fit: BoxFit.fill),
+              ),
+            ),
+            new Column(
+              children: <Widget>[
+                //new Image.network(demoPlayList.songs[0].albumArtUrl),
+                Padding(
+                  padding: EdgeInsets.only(top: 3.0),
+                ),
+                /*new Center(
+                  child: Container(
+                    //color: Colors.black54,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(image: AssetImage('assets/marrao/grelha.png'),fit: BoxFit.fill),
+                    ),
+                    width: double.infinity,
+                    padding: new EdgeInsets.all(34.0),
+                    child: Container(
+                      alignment: Alignment.centerRight,
+                      //child:
+                      ),
+                    ),
+                  ),*/
+                Column(
+                  children: <Widget>[
+                    Container(
+                      width: double.infinity,
+                      decoration: new BoxDecoration(
+                        color: Colors.white,
+                      ),
+                      padding: new EdgeInsets.only(
+                          top: 15.0, left: 20.0, right: 5.0, bottom: 30.0),
+                      child: new Center(
+                        child: Text(
+                          _currentQuestion.questionText,
+                          style: TextStyle(
+                              fontSize: 25.0,
+                              fontStyle: FontStyle.normal,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: 'Mono Social Icons',
+                              color: Colors.black),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 1.0),
+                ),
+                createTableAnswer(_currentQuestion),
+                Padding(
+                  padding: EdgeInsets.only(top: 5.0),
+                ),
+                /*new LinearProgressIndicator(
+                  backgroundColor: Colors.orange,
+                  value: _value*2,
+                  ),*/
+                //_overlayVisible ? CustomizeOverlay (_isCorrect): new Container(),
+              ],
+            )
+          ],
+        ),
+        bottomNavigationBar: Container(
+          color: Colors.transparent,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  AudioComponent(
+                      updateMe: [
+                        WatchableAudioProperties.audioPlayerState,
+                      ],
+                      playerBuilder: (BuildContext context, AudioPlayer player,
+                          Widget child) {
+                        IconData icon = Icons.music_note;
+                        Color buttonColor = Colors.orange;
+                        Function onPressed;
+
+                        if (player.state == AudioPlayerState.playing) {
+                          print("Paused");
+                          icon = Icons.pause;
+                          onPressed = player.pause;
+                          buttonColor = Colors.orange;
+                        } else if (player.state == AudioPlayerState.paused ||
+                            player.state == AudioPlayerState.completed) {
+                          print("played");
+                          icon = Icons.play_arrow;
+                          onPressed = player.play;
+                          buttonColor = Colors.orange;
+                        }
+                        return IconButton(
+                            icon: Icon(
+                              icon,
+                              color: buttonColor,
+                              size: 30.0,
+                            ),
+                            onPressed: onPressed);
+                      }),
+                  IconButton(
+                      icon: Icon(
+                        Icons.timer,
+                        color: Colors.orange,
+                        size: 30.0,
+                      ),
+                      onPressed: null),
+                  IconButton(
+                      icon: Icon(
+                        Icons.favorite,
+                        color: Colors.orange,
+                        size: 30.0,
+                      ),
+                      onPressed: null),
+                  IconButton(
+                    icon: Icon(
+                      Icons.refresh,
+                      color: Colors.orange,
+                      size: 30.0,
+                    ),
+                    onPressed: () =>
+                        Navigator.of(context).pushNamed("/SingleHome"),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
