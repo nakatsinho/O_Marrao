@@ -1,12 +1,12 @@
 # This is a generated file; do not edit or check into version control.
-connectivity=/home/kelton/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity-0.3.2/
-device_info=/home/kelton/flutter/.pub-cache/hosted/pub.dartlang.org/device_info-0.2.1/
-image_picker=/home/kelton/flutter/.pub-cache/hosted/pub.dartlang.org/image_picker-0.4.5/
-path_provider=/home/kelton/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider-2.0.3/
-path_provider_linux=/home/kelton/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_linux-2.0.2/
-path_provider_macos=/home/kelton/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_macos-2.0.2/
-path_provider_windows=/home/kelton/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_windows-2.0.3/
-shared_preferences=/home/kelton/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences-0.4.3/
-sqflite=/home/kelton/flutter/.pub-cache/hosted/pub.dartlang.org/sqflite-2.0.0+4/
-uni_links=/home/kelton/flutter/.pub-cache/hosted/pub.dartlang.org/uni_links-0.2.0/
-url_launcher=/home/kelton/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-3.0.3/
+connectivity=/home/kchampierpc/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/connectivity-0.3.2/
+device_info=/home/kchampierpc/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/device_info-0.2.1/
+image_picker=/home/kchampierpc/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/image_picker-0.4.5/
+path_provider=/home/kchampierpc/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider-2.0.4/
+path_provider_linux=/home/kchampierpc/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_linux-2.1.0/
+path_provider_macos=/home/kchampierpc/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_macos-2.0.2/
+path_provider_windows=/home/kchampierpc/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/path_provider_windows-2.0.3/
+shared_preferences=/home/kchampierpc/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences-0.4.3/
+sqflite=/home/kchampierpc/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/sqflite-2.0.0+4/
+uni_links=/home/kchampierpc/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/uni_links-0.2.0/
+url_launcher=/home/kchampierpc/snap/flutter/common/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-3.0.3/
